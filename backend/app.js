@@ -15,6 +15,12 @@ app.get('/', (req, res) => {
 
 app.put('/upload', (req, res, next) => {
 
+    var dir = './files';
+
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+    }
+
 
     const form = formidable({ multiples: true });
     form.maxFileSize = 800 * 1024 * 1024;
@@ -31,7 +37,7 @@ app.put('/upload', (req, res, next) => {
                 if (err) throw err;
             });
         })
-        
+
         res.write('File uploaded and moved!');
         // this is the path, variable newpath, but can't be accessed
         // outside this function, tried to make it global but didn't work either        

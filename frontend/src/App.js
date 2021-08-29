@@ -1,4 +1,6 @@
 import './App.css';
+import React from 'react'
+
 import Uploader from './components/Uploader';
 
 function App() {

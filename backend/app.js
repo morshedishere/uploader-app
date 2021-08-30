@@ -47,6 +47,25 @@ app.put('/upload', (req, res, next) => {
 
 })
 
+app.get('/files', (req, res) => {
+
+    const assetsDir = `./files`
+    let images = []
+    fs.readdir(assetsDir, async (err, files)=> {
+        if (err) {
+            console.log(err)
+            res.send(images)
+            return
+        }
+        files.map(
+            (file) => { 
+                images.push(`${assetsDir}/${file}`.replace('.',''))
+             }
+        )
+        res.send(images)
+    })
+})
+
 app.listen(port, () => {
     console.log(`App listening at http://localhost:${port}`)
 })

@@ -61,7 +61,7 @@ function Uploader() {
             {
                 fileList.map((file, index) => {
                     return <li key={index}>
-                        {file}
+                        <a href={`http://localhost:30001/${file}`} target={'_blank'}>{file}</a>
                     </li>
                 })
             }

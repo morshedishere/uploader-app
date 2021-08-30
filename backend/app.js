@@ -15,7 +15,7 @@ app.get('/', (req, res) => {
 
 app.put('/upload', (req, res, next) => {
 
-    var dir = './files';
+    var dir = './public';
 
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
@@ -32,7 +32,7 @@ app.put('/upload', (req, res, next) => {
         }
         Object.values(files).forEach((file) => {
             let oldpath = file.path;
-            let newpath = __dirname + '/files/' + file.name;
+            let newpath = __dirname + '/public/' + file.name;
             fs.rename(oldpath, newpath, function (err) {
                 if (err) throw err;
             });
@@ -49,7 +49,7 @@ app.put('/upload', (req, res, next) => {
 
 app.get('/files', (req, res) => {
 
-    const assetsDir = `./files`
+    const assetsDir = `./public`
     let images = []
     fs.readdir(assetsDir, async (err, files)=> {
         if (err) {
@@ -59,7 +59,7 @@ app.get('/files', (req, res) => {
         }
         files.map(
             (file) => { 
-                images.push(`${assetsDir}/${file}`.replace('.',''))
+                images.push(`${file}`)
              }
         )
         res.send(images)

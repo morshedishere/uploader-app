@@ -1,28 +1,10 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import styles from './Uploader.module.css'
 import axios from 'axios';
 
 function Uploader() {
-
-    const [count, setCount] = useState(0)
-    const [state,setState] = useState(0)
-
-    const fetchHome = async () => {
-        try {
-            const r = await fetch('http://localhost:30001/', {
-                method: 'GET', // *GET, POST, PUT, DELETE, etc.
-                mode: 'cors', // no-cors, *cors, same-origin
-                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            })
-            setCount(count => count + 1)
-            console.log(await r.json())
-        } catch (e) {
-            console.log(e)
-        }
-
-    }
+    const [fileList, setFileList] = useState([])
+    const [progress,setProgress] = useState(0)
 
     const uploadFile = async (e) => {
 
@@ -30,43 +12,60 @@ function Uploader() {
         var data = new FormData()
         data.append('file', file)
         data.append('user', 'hubot')
-        const params = {
-            method: 'PUT', // *GET, POST, PUT, DELETE, etc.
-            // mode: 'cors', // no-cors, *cors, same-origin
-            // cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-            // credentials: 'same-origin', // include, *same-origin, omit
-            // headers: {
-            //   'Content-Type': 'multipart-form-data'
-            //   // 'Content-Type': 'application/x-www-form-urlencoded',
-            // },
-            // redirect: 'follow', // manual, *follow, error
-            // referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-            body: data // body data type must match "Content-Type" header
-        }
         try {
             // const r = await fetch('http://localhost:30001/upload', params)
             // console.log(await r.json())
-            const {status,...response} = await axios.request({
-                method: "put", 
-                url: "http://localhost:30001/upload", 
-                data: data, 
+            const { status, ...response } = await axios.request({
+                method: "put",
+                url: "http://localhost:30001/upload",
+                data: data,
                 onUploadProgress: (p) => {
-                  console.log(p); 
-                  setState(p.loaded / p.total*100)
+                    setProgress(p.loaded / p.total * 100)
                 }
             })
-            console.log(status)
+            getFilsList()
         } catch (e) {
             console.log(e)
         }
     }
+
+    const getFilsList = async () => {
+        try {
+            const r = await fetch('http://localhost:30001/files', {
+                method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+            const list = await r.json()
+            setFileList(list)
+        } catch (e) {
+            console.log(e)
+        }
+
+    }
+
+    useEffect(()=>{
+        getFilsList()
+    },[])
     return (<section>
         <fieldset>
             <label>Upload</label>
             <input type="file" onChange={(e) => uploadFile(e)} />
-            <button onClick={() => fetchHome()}>{count}</button>
         </fieldset>
-        <progress id="file" value={state} max="100"> {state}% </progress>
+        <progress id="file" value={progress} max="100"> {progress}% </progress>
+
+        <ul className={styles.fileList}>
+            {
+                fileList.map((file, index) => {
+                    return <li key={index}>
+                        {file}
+                    </li>
+                })
+            }
+        </ul>
 
 
     </section>)
